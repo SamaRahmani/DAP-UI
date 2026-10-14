@@ -1,0 +1,99 @@
+<div class="min-h-screen bg-slate-100">
+
+  <!-- Sidebar -->
+  <aside class="fixed inset-y-0 left-0 w-64 bg-slate-900 text-white">
+
+    <div class="border-b border-slate-700 px-6 py-6">
+      <h1 class="text-xl font-bold">DAP Admin</h1>
+      <p class="mt-1 text-sm text-slate-400">
+        Vehicle Pricing System
+      </p>
+    </div>
+
+    <nav class="mt-6 space-y-2 px-4">
+
+      <a
+        routerLink="/dashboard"
+        routerLinkActive="bg-blue-600"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="block rounded-lg px-4 py-3 hover:bg-slate-800"
+      >
+        Dashboard
+      </a>
+
+      <a
+        routerLink="/vehicles"
+        routerLinkActive="bg-blue-600"
+        class="block rounded-lg px-4 py-3 hover:bg-slate-800"
+      >
+        Vehicles
+      </a>
+
+      <a
+        href="#"
+        class="block rounded-lg px-4 py-3 text-slate-300 hover:bg-slate-800"
+      >
+        States & Cities
+      </a>
+
+      <a
+        href="#"
+        class="block rounded-lg px-4 py-3 text-slate-300 hover:bg-slate-800"
+      >
+        RTO Management
+      </a>
+
+      <a
+        href="#"
+        class="block rounded-lg px-4 py-3 text-slate-300 hover:bg-slate-800"
+      >
+        Insurance
+      </a>
+
+      <a
+        href="#"
+        class="block rounded-lg px-4 py-3 text-slate-300 hover:bg-slate-800"
+      >
+        Tax Configuration
+      </a>
+
+      <a
+        href="#"
+        class="block rounded-lg px-4 py-3 text-slate-300 hover:bg-slate-800"
+      >
+        Registration Charges
+      </a>
+
+    </nav>
+
+  </aside>
+
+  <!-- Main content -->
+  <main class="ml-64 min-h-screen p-8">
+
+    <header class="mb-8 flex items-center justify-between">
+
+      <div>
+        <h2 class="text-2xl font-bold text-slate-900">
+          DAP Administration
+        </h2>
+
+        <p class="mt-1 text-slate-500">
+          Manage vehicle pricing and configuration.
+        </p>
+      </div>
+
+      <div class="rounded-lg bg-white px-4 py-2 shadow-sm">
+        <span class="text-sm font-medium text-slate-700">
+          Administrator
+        </span>
+      </div>
+
+    </header>
+
+    <!-- Dashboard or Vehicles appears here -->
+    <router-outlet />
+
+  </main>
+
+</div>

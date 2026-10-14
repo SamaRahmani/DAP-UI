@@ -1,0 +1,519 @@
+<div class="space-y-6">
+
+  <!-- Page Header -->
+  <section class="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+
+    <div>
+      <h1 class="text-2xl font-bold text-slate-900">
+        Vehicle Management
+      </h1>
+
+      <p class="mt-2 text-slate-500">
+        Manage vehicle models, variants, specifications, and prices.
+      </p>
+    </div>
+
+    <button
+      type="button"
+      (click)="openAddForm()"
+      class="rounded-lg bg-blue-600 px-5 py-3 font-medium text-white hover:bg-blue-700"
+    >
+      + Add Vehicle
+    </button>
+
+  </section>
+
+
+  <!-- Search -->
+  <section class="rounded-xl bg-white p-5 shadow-sm">
+
+    <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+
+      <div class="flex-1">
+
+        <label
+          for="vehicleSearch"
+          class="mb-2 block text-sm font-medium text-slate-700"
+        >
+          Search Vehicles
+        </label>
+
+        <input
+          id="vehicleSearch"
+          type="text"
+          [(ngModel)]="searchText"
+          placeholder="Search by ID, model, variant, fuel, or transmission"
+          class="w-full rounded-lg border border-slate-300 px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+        />
+
+      </div>
+
+      <p class="text-sm text-slate-500">
+        Showing
+        <span class="font-semibold text-slate-900">
+          {{ filteredVehicles.length }}
+        </span>
+        of
+        <span class="font-semibold text-slate-900">
+          {{ vehicles.length }}
+        </span>
+        vehicles
+      </p>
+
+    </div>
+
+  </section>
+
+
+  <!-- Vehicle Table -->
+  <section class="overflow-hidden rounded-xl bg-white shadow-sm">
+
+    <div class="overflow-x-auto">
+
+      <table class="w-full text-left">
+
+        <thead class="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+
+          <tr>
+            <th class="whitespace-nowrap px-5 py-4 font-semibold">Vehicle ID</th>
+            <th class="whitespace-nowrap px-5 py-4 font-semibold">Model</th>
+            <th class="whitespace-nowrap px-5 py-4 font-semibold">Variant</th>
+            <th class="whitespace-nowrap px-5 py-4 font-semibold">Fuel</th>
+            <th class="whitespace-nowrap px-5 py-4 font-semibold">Transmission</th>
+            <th class="whitespace-nowrap px-5 py-4 font-semibold">Ex-showroom Price</th>
+            <th class="whitespace-nowrap px-5 py-4 font-semibold">Dimensions</th>
+            <th class="whitespace-nowrap px-5 py-4 font-semibold">Actions</th>
+          </tr>
+
+        </thead>
+
+        <tbody>
+
+          <!-- Vehicle Rows -->
+          <tr
+            *ngFor="let vehicle of filteredVehicles"
+            class="border-t border-slate-100 hover:bg-slate-50"
+          >
+
+            <td class="whitespace-nowrap px-5 py-4 font-semibold text-slate-900">
+              {{ vehicle.vehicleId }}
+            </td>
+
+            <td class="whitespace-nowrap px-5 py-4 text-slate-700">
+              {{ vehicle.modelName }}
+            </td>
+
+            <td class="whitespace-nowrap px-5 py-4 text-slate-700">
+              {{ vehicle.variantName }}
+            </td>
+
+            <td class="whitespace-nowrap px-5 py-4">
+              <span
+                class="rounded-full px-3 py-1 text-xs font-medium"
+                [ngClass]="vehicle.fuelType === 'Diesel'
+                  ? 'bg-amber-100 text-amber-800'
+                  : 'bg-blue-100 text-blue-800'"
+              >
+                {{ vehicle.fuelType }}
+              </span>
+            </td>
+
+            <td class="whitespace-nowrap px-5 py-4 text-slate-700">
+              {{ vehicle.transmissionType }}
+            </td>
+
+            <td class="whitespace-nowrap px-5 py-4 font-medium text-slate-900">
+              {{ vehicle.exShowroomPrice | currency:'INR':'symbol':'1.0-0':'en-IN' }}
+            </td>
+
+            <td class="whitespace-nowrap px-5 py-4 text-sm text-slate-600">
+              <div>Length: {{ vehicle.lengthMm }} mm</div>
+              <div class="mt-1">
+                Ground clearance: {{ vehicle.groundClearanceMm }} mm
+              </div>
+            </td>
+
+            <td class="whitespace-nowrap px-5 py-4">
+
+              <button
+                type="button"
+                (click)="openEditForm(vehicle)"
+                class="mr-3 font-medium text-blue-600 hover:text-blue-800"
+              >
+                Edit
+              </button>
+
+              <button
+                type="button"
+                (click)="deleteVehicle(vehicle)"
+                class="font-medium text-red-600 hover:text-red-800"
+              >
+                Delete
+              </button>
+
+            </td>
+
+          </tr>
+
+          <!-- Empty State -->
+          <tr *ngIf="filteredVehicles.length === 0">
+
+            <td colspan="8" class="px-6 py-12 text-center">
+
+              <p class="font-medium text-slate-700">
+                No vehicles found
+              </p>
+
+              <p class="mt-2 text-sm text-slate-500">
+                Try another search or add a new vehicle.
+              </p>
+
+            </td>
+
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+    <div class="border-t border-slate-100 px-6 py-4 text-sm text-slate-500">
+      {{ vehicles.length }} vehicle records in this session.
+    </div>
+
+  </section>
+
+
+  <!-- Add/Edit Vehicle Form -->
+  <div
+    *ngIf="showForm"
+    class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-slate-900/50 p-4"
+  >
+
+    <section class="my-auto w-full max-w-3xl rounded-2xl bg-white shadow-xl">
+
+      <!-- Form Header -->
+      <div class="flex items-center justify-between border-b border-slate-200 px-6 py-5">
+
+        <div>
+          <h2 class="text-xl font-bold text-slate-900">
+            {{ isEditMode ? 'Edit Vehicle' : 'Add Vehicle' }}
+          </h2>
+
+          <p class="mt-1 text-sm text-slate-500">
+            Enter the vehicle information below.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          (click)="closeForm()"
+          class="rounded-lg px-3 py-2 text-xl text-slate-500 hover:bg-slate-100"
+          aria-label="Close form"
+        >
+          &times;
+        </button>
+
+      </div>
+
+
+      <!-- Form Body -->
+      <form
+        #vehicleForm="ngForm"
+        (ngSubmit)="saveVehicle()"
+        class="space-y-6 p-6"
+      >
+
+        <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+
+          <!-- Vehicle ID -->
+          <div>
+
+            <label
+              for="vehicleId"
+              class="mb-2 block text-sm font-medium text-slate-700"
+            >
+              Vehicle ID *
+            </label>
+
+            <input
+              id="vehicleId"
+              name="vehicleId"
+              type="text"
+              [(ngModel)]="formVehicle.vehicleId"
+              #vehicleId="ngModel"
+              required
+              maxlength="30"
+              [readonly]="isEditMode"
+              class="w-full rounded-lg border border-slate-300 px-4 py-3 outline-none focus:border-blue-500 disabled:bg-slate-100"
+              [class.bg-slate-100]="isEditMode"
+            />
+
+            <p
+              *ngIf="vehicleId.invalid && vehicleId.touched"
+              class="mt-1 text-sm text-red-600"
+            >
+              Vehicle ID is required and must not exceed 30 characters.
+            </p>
+
+          </div>
+
+
+          <!-- Model Name -->
+          <div>
+
+            <label
+              for="modelName"
+              class="mb-2 block text-sm font-medium text-slate-700"
+            >
+              Model Name *
+            </label>
+
+            <input
+              id="modelName"
+              name="modelName"
+              type="text"
+              [(ngModel)]="formVehicle.modelName"
+              #modelName="ngModel"
+              required
+              maxlength="100"
+              class="w-full rounded-lg border border-slate-300 px-4 py-3 outline-none focus:border-blue-500"
+            />
+
+            <p
+              *ngIf="modelName.invalid && modelName.touched"
+              class="mt-1 text-sm text-red-600"
+            >
+              Model name is required and cannot exceed 100 characters.
+            </p>
+
+          </div>
+
+
+          <!-- Variant Name -->
+          <div>
+
+            <label
+              for="variantName"
+              class="mb-2 block text-sm font-medium text-slate-700"
+            >
+              Variant Name *
+            </label>
+
+            <input
+              id="variantName"
+              name="variantName"
+              type="text"
+              [(ngModel)]="formVehicle.variantName"
+              #variantName="ngModel"
+              required
+              maxlength="100"
+              class="w-full rounded-lg border border-slate-300 px-4 py-3 outline-none focus:border-blue-500"
+            />
+
+            <p
+              *ngIf="variantName.invalid && variantName.touched"
+              class="mt-1 text-sm text-red-600"
+            >
+              Variant name is required and cannot exceed 100 characters.
+            </p>
+
+          </div>
+
+
+          <!-- Fuel Type -->
+          <div>
+
+            <label
+              for="fuelType"
+              class="mb-2 block text-sm font-medium text-slate-700"
+            >
+              Fuel Type *
+            </label>
+
+            <select
+              id="fuelType"
+              name="fuelType"
+              [(ngModel)]="formVehicle.fuelType"
+              #fuelType="ngModel"
+              required
+              class="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 outline-none focus:border-blue-500"
+            >
+              <option value="" disabled>Select fuel type</option>
+              <option value="Petrol">Petrol</option>
+              <option value="Diesel">Diesel</option>
+              <option value="Electric">Electric</option>
+              <option value="Hybrid">Hybrid</option>
+              <option value="CNG">CNG</option>
+            </select>
+
+            <p
+              *ngIf="fuelType.invalid && fuelType.touched"
+              class="mt-1 text-sm text-red-600"
+            >
+              Please select a fuel type.
+            </p>
+
+          </div>
+
+
+          <!-- Transmission Type -->
+          <div>
+
+            <label
+              for="transmissionType"
+              class="mb-2 block text-sm font-medium text-slate-700"
+            >
+              Transmission Type *
+            </label>
+
+            <select
+              id="transmissionType"
+              name="transmissionType"
+              [(ngModel)]="formVehicle.transmissionType"
+              #transmissionType="ngModel"
+              required
+              class="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 outline-none focus:border-blue-500"
+            >
+              <option value="" disabled>Select transmission</option>
+              <option value="Automatic">Automatic</option>
+              <option value="Manual">Manual</option>
+            </select>
+
+            <p
+              *ngIf="transmissionType.invalid && transmissionType.touched"
+              class="mt-1 text-sm text-red-600"
+            >
+              Please select a transmission type.
+            </p>
+
+          </div>
+
+
+          <!-- Ex-showroom Price -->
+          <div>
+
+            <label
+              for="exShowroomPrice"
+              class="mb-2 block text-sm font-medium text-slate-700"
+            >
+              Ex-showroom Price (₹) *
+            </label>
+
+            <input
+              id="exShowroomPrice"
+              name="exShowroomPrice"
+              type="number"
+              [(ngModel)]="formVehicle.exShowroomPrice"
+              #exShowroomPrice="ngModel"
+              required
+              min="0"
+              step="0.01"
+              class="w-full rounded-lg border border-slate-300 px-4 py-3 outline-none focus:border-blue-500"
+            />
+
+            <p
+              *ngIf="exShowroomPrice.invalid && exShowroomPrice.touched"
+              class="mt-1 text-sm text-red-600"
+            >
+              Enter a valid, non-negative price.
+            </p>
+
+          </div>
+
+
+          <!-- Length -->
+          <div>
+
+            <label
+              for="lengthMm"
+              class="mb-2 block text-sm font-medium text-slate-700"
+            >
+              Length (mm) *
+            </label>
+
+            <input
+              id="lengthMm"
+              name="lengthMm"
+              type="number"
+              [(ngModel)]="formVehicle.lengthMm"
+              #lengthMm="ngModel"
+              required
+              min="0"
+              step="0.01"
+              class="w-full rounded-lg border border-slate-300 px-4 py-3 outline-none focus:border-blue-500"
+            />
+
+            <p
+              *ngIf="lengthMm.invalid && lengthMm.touched"
+              class="mt-1 text-sm text-red-600"
+            >
+              Enter a valid, non-negative length.
+            </p>
+
+          </div>
+
+
+          <!-- Ground Clearance -->
+          <div>
+
+            <label
+              for="groundClearanceMm"
+              class="mb-2 block text-sm font-medium text-slate-700"
+            >
+              Ground Clearance (mm) *
+            </label>
+
+            <input
+              id="groundClearanceMm"
+              name="groundClearanceMm"
+              type="number"
+              [(ngModel)]="formVehicle.groundClearanceMm"
+              #groundClearanceMm="ngModel"
+              required
+              min="0"
+              step="0.01"
+              class="w-full rounded-lg border border-slate-300 px-4 py-3 outline-none focus:border-blue-500"
+            />
+
+            <p
+              *ngIf="groundClearanceMm.invalid && groundClearanceMm.touched"
+              class="mt-1 text-sm text-red-600"
+            >
+              Enter a valid, non-negative ground clearance.
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <!-- Form Actions -->
+        <div class="flex justify-end gap-3 border-t border-slate-200 pt-5">
+
+          <button
+            type="button"
+            (click)="closeForm()"
+            class="rounded-lg border border-slate-300 px-5 py-3 font-medium text-slate-700 hover:bg-slate-50"
+          >
+            Cancel
+          </button>
+
+          <button
+            type="submit"
+            [disabled]="vehicleForm.invalid"
+            class="rounded-lg bg-blue-600 px-5 py-3 font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {{ isEditMode ? 'Save Changes' : 'Add Vehicle' }}
+          </button>
+
+        </div>
+
+      </form>
+
+    </section>
+
+  </div>
+
+</div>
