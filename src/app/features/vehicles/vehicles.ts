@@ -1,8 +1,15 @@
-import { Component } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  inject,
+  ChangeDetectorRef
+} from '@angular/core';
+
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import { Vehicle } from '../../models/vehicle.model';
+import { AdminVehicleService } from '../../services/admin-vehicle';
 
 @Component({
   selector: 'app-vehicles',
@@ -10,72 +17,20 @@ import { Vehicle } from '../../models/vehicle.model';
   templateUrl: './vehicles.html',
   styleUrl: './vehicles.css'
 })
-export class Vehicles {
+export class Vehicles implements OnInit {
 
-  // Sample vehicle data.
-  // We will replace this array with backend API data later.
-  vehicles: Vehicle[] = [
-    {
-      vehicleId: 'MB-C200',
-      modelName: 'C-Class',
-      variantName: 'C 200',
-      fuelType: 'Petrol',
-      transmissionType: 'Automatic',
-      exShowroomPrice: 6000000,
-      lengthMm: 4751,
-      groundClearanceMm: 157
-    },
-    {
-      vehicleId: 'MB-C220D',
-      modelName: 'C-Class',
-      variantName: 'C 220d',
-      fuelType: 'Diesel',
-      transmissionType: 'Automatic',
-      exShowroomPrice: 6200000,
-      lengthMm: 4751,
-      groundClearanceMm: 157
-    },
-    {
-      vehicleId: 'MB-E200',
-      modelName: 'E-Class',
-      variantName: 'E 200',
-      fuelType: 'Petrol',
-      transmissionType: 'Automatic',
-      exShowroomPrice: 8000000,
-      lengthMm: 4949,
-      groundClearanceMm: 146
-    },
-    {
-      vehicleId: 'MB-E220D',
-      modelName: 'E-Class',
-      variantName: 'E 220d',
-      fuelType: 'Diesel',
-      transmissionType: 'Automatic',
-      exShowroomPrice: 8500000,
-      lengthMm: 4949,
-      groundClearanceMm: 146
-    },
-    {
-      vehicleId: 'MB-GLC220D',
-      modelName: 'GLC',
-      variantName: 'GLC 220d',
-      fuelType: 'Diesel',
-      transmissionType: 'Automatic',
-      exShowroomPrice: 7800000,
-      lengthMm: 4716,
-      groundClearanceMm: 200
-    },
-    {
-      vehicleId: 'MB-GLC300',
-      modelName: 'GLC',
-      variantName: 'GLC 300',
-      fuelType: 'Petrol',
-      transmissionType: 'Automatic',
-      exShowroomPrice: 7500000,
-      lengthMm: 4716,
-      groundClearanceMm: 200
-    }
-  ];
+  // Service responsible for communicating with Spring Boot.
+  private readonly vehicleService = inject(AdminVehicleService);
+
+  // Used to refresh the view after an API response.
+  private readonly cdr = inject(ChangeDetectorRef);
+
+  // Vehicles retrieved from the backend.
+  vehicles: Vehicle[] = [];
+
+  // Loading and error states.
+  isLoading = false;
+  errorMessage = '';
 
   // Search input value.
   searchText = '';
@@ -87,14 +42,48 @@ export class Vehicles {
   isEditMode = false;
 
   // Stores the ID of the vehicle being edited.
-  // We use this to prevent changing the primary key accidentally.
   editingVehicleId: string | null = null;
 
   // Form data.
   formVehicle: Vehicle = this.createEmptyVehicle();
 
+  // Load vehicles automatically when the component initializes.
+  ngOnInit(): void {
+    this.loadVehicles();
+  }
+
+  // Fetch vehicles from Spring Boot.
+  loadVehicles(): void {
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    this.vehicleService.getAllVehicles().subscribe({
+
+      next: (vehicles) => {
+        this.vehicles = vehicles;
+        this.isLoading = false;
+
+        // Explicitly refresh the view after receiving the response.
+        this.cdr.detectChanges();
+      },
+
+      error: (error) => {
+        console.error('Failed to load vehicles:', error);
+
+        this.errorMessage =
+          'Unable to load vehicles. Please check the backend connection.';
+
+        this.isLoading = false;
+
+        this.cdr.detectChanges();
+      }
+
+    });
+  }
+
   // Returns vehicles matching the search.
   get filteredVehicles(): Vehicle[] {
+
     const search = this.searchText.trim().toLowerCase();
 
     if (!search) {
@@ -143,8 +132,10 @@ export class Vehicles {
     this.showForm = true;
   }
 
-  // Saves a new vehicle or updates an existing vehicle.
+  // TEMPORARY: Save locally.
+  // We will connect POST and PUT to Spring Boot next.
   saveVehicle(): void {
+
     const vehicleId = this.formVehicle.vehicleId.trim();
 
     if (!vehicleId) {
@@ -153,6 +144,7 @@ export class Vehicles {
 
     // Check for duplicate IDs when adding.
     if (!this.isEditMode) {
+
       const duplicate = this.vehicles.some(
         vehicle =>
           vehicle.vehicleId.toLowerCase() === vehicleId.toLowerCase()
@@ -170,7 +162,9 @@ export class Vehicles {
           vehicleId
         }
       ];
+
     } else {
+
       // Find the existing vehicle using its original ID.
       const originalId = this.editingVehicleId;
 
@@ -182,13 +176,16 @@ export class Vehicles {
             }
           : vehicle
       );
+
     }
 
     this.closeForm();
   }
 
-  // Deletes a vehicle after confirmation.
+  // TEMPORARY: Delete locally.
+  // We will connect DELETE to Spring Boot next.
   deleteVehicle(vehicle: Vehicle): void {
+
     const confirmed = window.confirm(
       `Are you sure you want to delete ${vehicle.vehicleId} (${vehicle.modelName})?`
     );
@@ -209,4 +206,5 @@ export class Vehicles {
     this.editingVehicleId = null;
     this.formVehicle = this.createEmptyVehicle();
   }
+
 }
