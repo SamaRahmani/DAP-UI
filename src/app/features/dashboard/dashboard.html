@@ -1,5 +1,6 @@
 <div class="space-y-8">
 
+  <!-- Dashboard Heading -->
   <section>
     <h1 class="text-2xl font-bold text-slate-900">
       Dashboard
@@ -10,52 +11,95 @@
     </p>
   </section>
 
-  <!-- Summary Cards -->
-  <section class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
 
+  <!-- Loading Message -->
+  <section
+    *ngIf="isLoading"
+    class="rounded-lg border border-blue-200 bg-blue-50 p-4 text-blue-700"
+    role="status"
+  >
+    Loading dashboard statistics...
+  </section>
+
+
+  <!-- Error Message -->
+  <section
+    *ngIf="errorMessage"
+    class="rounded-lg border border-red-200 bg-red-50 p-4 text-red-700"
+    role="alert"
+  >
+    <p>{{ errorMessage }}</p>
+
+    <button
+      type="button"
+      (click)="loadDashboard()"
+      class="mt-2 font-semibold underline"
+    >
+      Retry
+    </button>
+  </section>
+
+
+  <!-- Summary Cards -->
+  <section
+    class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3"
+  >
+
+    <!-- Total Vehicles -->
     <div class="rounded-xl bg-white p-6 shadow-sm">
+
       <p class="text-sm font-medium text-slate-500">
         Total Vehicles
       </p>
 
       <h2 class="mt-3 text-3xl font-bold text-slate-900">
-        1
+        {{ isLoading ? '—' : summary.totalVehicles }}
       </h2>
 
       <p class="mt-2 text-sm text-slate-500">
         Configured vehicle models
       </p>
+
     </div>
 
+
+    <!-- RTO Locations -->
     <div class="rounded-xl bg-white p-6 shadow-sm">
+
       <p class="text-sm font-medium text-slate-500">
         RTO Locations
       </p>
 
       <h2 class="mt-3 text-3xl font-bold text-slate-900">
-        1
+        {{ isLoading ? '—' : summary.totalRtoLocations }}
       </h2>
 
       <p class="mt-2 text-sm text-slate-500">
         Configured RTO offices
       </p>
+
     </div>
 
+
+    <!-- Insurance Providers -->
     <div class="rounded-xl bg-white p-6 shadow-sm">
+
       <p class="text-sm font-medium text-slate-500">
         Insurance Providers
       </p>
 
       <h2 class="mt-3 text-3xl font-bold text-slate-900">
-        1
+        {{ isLoading ? '—' : summary.totalInsuranceProviders }}
       </h2>
 
       <p class="mt-2 text-sm text-slate-500">
         Configured insurance options
       </p>
+
     </div>
 
   </section>
+
 
   <!-- Welcome Card -->
   <section class="rounded-xl bg-white p-8 shadow-sm">
@@ -70,6 +114,8 @@
       drive-away price of a vehicle.
     </p>
 
+
+    <!-- Vehicle Management -->
     <div class="mt-6 rounded-lg border border-blue-100 bg-blue-50 p-4">
 
       <h3 class="font-medium text-blue-900">
