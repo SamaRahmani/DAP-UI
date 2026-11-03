@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 import { Vehicle } from '../models/vehicle.model';
 
@@ -12,7 +13,7 @@ export class AdminVehicleService {
   private readonly http = inject(HttpClient);
 
   private readonly apiUrl =
-    'http://localhost:8080/api/v1/admin/vehicles';
+  `${environment.apiBaseUrl}/vehicles`;
 
   getAllVehicles(): Observable<Vehicle[]> {
     return this.http.get<Vehicle[]>(this.apiUrl);

@@ -1,8 +1,13 @@
+
 import { Routes } from '@angular/router';
 
 import { AdminLayout } from './layout/admin-layout/admin-layout';
 import { Dashboard } from './features/dashboard/dashboard';
 import { Vehicles } from './features/vehicles/vehicles';
+import { Locations } from './features/locations/locations';
+import { InsuranceComponent } from './features/insurance/insurance';
+import { RegistrationCharges } from './features/registration-charges/registration-charges';
+
 
 export const routes: Routes = [
   {
@@ -21,6 +26,16 @@ export const routes: Routes = [
       {
         path: 'vehicles',
         component: Vehicles
+      },
+      {
+        path: 'locations',
+        component: Locations
+      },
+      { path: 'insurance', component: InsuranceComponent },
+      { path: 'registration-charges', component: RegistrationCharges },
+      {
+        path: '**',
+        redirectTo: 'dashboard'
       }
     ]
   }

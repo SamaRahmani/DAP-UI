@@ -1,0 +1,498 @@
+
+<div class="w-full space-y-6">
+
+  <!-- PAGE HEADER -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">
+        Registration Charges
+      </h1>
+      <p class="mt-1 text-sm text-gray-500">
+        Manage national, state and city-level registration charges.
+      </p>
+    </div>
+
+    <button
+      type="button"
+      (click)="openAddForm()"
+      class="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 transition">
+      <span class="text-lg">+</span>
+      Add Registration Charge
+    </button>
+  </div>
+
+  <!-- SUCCESS MESSAGE -->
+  @if (successMessage) {
+    <div class="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
+      {{ successMessage }}
+    </div>
+  }
+
+  <!-- ERROR MESSAGE -->
+  @if (errorMessage && !showForm) {
+    <div class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+      {{ errorMessage }}
+    </div>
+  }
+
+  <!-- SUMMARY CARDS -->
+  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+
+    <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+      <p class="text-sm font-medium text-gray-500">
+        Total Charges
+      </p>
+      <div class="mt-3 flex items-center justify-between">
+        <h2 class="text-3xl font-bold text-gray-900">
+          {{ registrationCharges.length }}
+        </h2>
+        <div class="rounded-lg bg-blue-50 p-3 text-blue-600">
+          <span class="text-xl">₹</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+      <p class="text-sm font-medium text-gray-500">
+        National Charges
+      </p>
+      <div class="mt-3 flex items-center justify-between">
+        <h2 class="text-3xl font-bold text-gray-900">
+          {{ nationalCount }}
+        </h2>
+        <div class="rounded-lg bg-purple-50 p-3 text-purple-600">
+          <span class="text-xl">◎</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+      <p class="text-sm font-medium text-gray-500">
+        State Charges
+      </p>
+      <div class="mt-3 flex items-center justify-between">
+        <h2 class="text-3xl font-bold text-gray-900">
+          {{ stateCount }}
+        </h2>
+        <div class="rounded-lg bg-blue-50 p-3 text-blue-600">
+          <span class="text-xl">⌖</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+      <p class="text-sm font-medium text-gray-500">
+        City Charges
+      </p>
+      <div class="mt-3 flex items-center justify-between">
+        <h2 class="text-3xl font-bold text-gray-900">
+          {{ cityCount }}
+        </h2>
+        <div class="rounded-lg bg-orange-50 p-3 text-orange-600">
+          <span class="text-xl">⌂</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- TABLE SECTION -->
+  <div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+
+    <!-- TABLE HEADER -->
+    <div class="flex flex-col gap-4 border-b border-gray-200 p-5 sm:flex-row sm:items-center sm:justify-between">
+      <div>
+        <h2 class="text-lg font-semibold text-gray-900">
+          All Registration Charges
+        </h2>
+        <p class="mt-1 text-sm text-gray-500">
+          View and manage configured registration charges.
+        </p>
+      </div>
+
+      <div class="relative w-full sm:max-w-xs">
+        <input
+          type="text"
+          [(ngModel)]="searchText"
+          placeholder="Search charges..."
+          class="w-full rounded-lg border border-gray-300 py-2.5 pl-4 pr-4 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100">
+      </div>
+    </div>
+
+    <!-- LOADING -->
+    @if (isLoading) {
+      <div class="flex justify-center py-16">
+        <div class="h-8 w-8 animate-spin rounded-full border-4 border-blue-600 border-t-transparent"></div>
+      </div>
+    }
+
+    <!-- TABLE -->
+    @if (!isLoading) {
+      <div class="w-full overflow-x-auto">
+        <table class="w-full min-w-[850px] text-left text-sm">
+
+          <thead class="bg-gray-50 text-xs uppercase tracking-wider text-gray-500">
+            <tr>
+              <th class="px-6 py-4 font-semibold">ID</th>
+              <th class="px-6 py-4 font-semibold">Charge Name</th>
+              <th class="px-6 py-4 font-semibold">Scope</th>
+              <th class="px-6 py-4 font-semibold">State</th>
+              <th class="px-6 py-4 font-semibold">City ID</th>
+              <th class="px-6 py-4 font-semibold">Charge Value</th>
+              <th class="px-6 py-4 text-right font-semibold">Actions</th>
+            </tr>
+          </thead>
+
+          <tbody class="divide-y divide-gray-100">
+
+            @for (charge of filteredCharges; track charge.registrationChargeId) {
+              <tr class="transition hover:bg-gray-50">
+
+                <td class="px-6 py-4 font-medium text-gray-500">
+                  #{{ charge.registrationChargeId }}
+                </td>
+
+                <td class="px-6 py-4">
+                  <span class="font-semibold text-gray-900">
+                    {{ charge.chargeName }}
+                  </span>
+                </td>
+
+                <td class="px-6 py-4">
+                  @if (charge.chargeScope === 'NATIONAL') {
+                    <span class="rounded-full bg-purple-100 px-3 py-1 text-xs font-semibold text-purple-700">
+                      National
+                    </span>
+                  }
+
+                  @if (charge.chargeScope === 'STATE') {
+                    <span class="rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700">
+                      State
+                    </span>
+                  }
+
+                  @if (charge.chargeScope === 'CITY') {
+                    <span class="rounded-full bg-orange-100 px-3 py-1 text-xs font-semibold text-orange-700">
+                      City
+                    </span>
+                  }
+                </td>
+
+                <td class="px-6 py-4 text-gray-600">
+                  {{ getStateName(charge.stateCode) }}
+                </td>
+
+                <td class="px-6 py-4 text-gray-600">
+                  {{ charge.cityId ?? '—' }}
+                </td>
+
+                <td class="px-6 py-4 font-semibold text-gray-900">
+                  ₹{{ charge.chargeValue | number:'1.2-4' }}
+                </td>
+
+                <td class="px-6 py-4">
+                  <div class="flex justify-end gap-2">
+
+                    <button
+                      type="button"
+                      (click)="openEditForm(charge)"
+                      class="rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-100">
+                      Edit
+                    </button>
+
+                    <button
+                      type="button"
+                      (click)="deleteCharge(charge)"
+                      class="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50">
+                      Delete
+                    </button>
+
+                  </div>
+                </td>
+
+              </tr>
+            }
+
+            @if (filteredCharges.length === 0) {
+              <tr>
+                <td colspan="7" class="px-6 py-14 text-center">
+                  <p class="font-medium text-gray-700">
+                    No registration charges found.
+                  </p>
+                  <p class="mt-1 text-sm text-gray-500">
+                    Try another search or add a new registration charge.
+                  </p>
+                </td>
+              </tr>
+            }
+
+          </tbody>
+        </table>
+      </div>
+    }
+
+    <!-- TABLE FOOTER -->
+    @if (!isLoading) {
+      <div class="border-t border-gray-200 px-6 py-4">
+        <p class="text-sm text-gray-500">
+          Showing {{ filteredCharges.length }} of
+          {{ registrationCharges.length }} registration charges
+        </p>
+      </div>
+    }
+
+  </div>
+
+</div>
+
+
+<!-- ===================================== -->
+<!-- ADD / EDIT MODAL -->
+<!-- ===================================== -->
+
+@if (showForm) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/40 p-4">
+
+    <div class="my-auto w-full max-w-xl rounded-2xl bg-white shadow-2xl">
+
+      <!-- MODAL HEADER -->
+      <div class="flex items-center justify-between border-b border-gray-200 px-6 py-5">
+        <div>
+          <h2 class="text-xl font-bold text-gray-900">
+            {{ isEditMode ? 'Edit Registration Charge' : 'Add Registration Charge' }}
+          </h2>
+          <p class="mt-1 text-sm text-gray-500">
+            Configure charge scope and amount.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          (click)="closeForm()"
+          class="rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-700">
+          ✕
+        </button>
+      </div>
+
+      <!-- MODAL BODY -->
+      <form
+        #chargeForm="ngForm"
+        (ngSubmit)="saveCharge()"
+        class="space-y-5 p-6">
+
+        @if (errorMessage) {
+          <div class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {{ errorMessage }}
+          </div>
+        }
+
+        <!-- SCOPE -->
+        <div>
+          <label class="mb-2 block text-sm font-semibold text-gray-700">
+            Charge Scope <span class="text-red-500">*</span>
+          </label>
+
+          <select
+            name="chargeScope"
+            [(ngModel)]="formCharge.chargeScope"
+            (ngModelChange)="onScopeChange()"
+            required
+            class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100">
+
+            <option value="NATIONAL">National</option>
+            <option value="STATE">State</option>
+            <option value="CITY">City</option>
+
+          </select>
+
+          <p class="mt-1.5 text-xs text-gray-500">
+            Select where this registration charge applies.
+          </p>
+        </div>
+
+        <!-- STATE DROPDOWN -->
+        @if (formCharge.chargeScope === 'STATE' || formCharge.chargeScope === 'CITY') {
+          <div>
+            <label class="mb-2 block text-sm font-semibold text-gray-700">
+              State <span class="text-red-500">*</span>
+            </label>
+
+            <select
+              name="stateCode"
+              [(ngModel)]="formCharge.stateCode"
+              (ngModelChange)="onStateChange()"
+              required
+              class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100">
+
+              <option [ngValue]="null">Select State</option>
+
+              @for (state of states; track state.stateCode) {
+                <option [value]="state.stateCode">
+                  {{ state.stateName }} ({{ state.stateCode }})
+                </option>
+              }
+
+            </select>
+          </div>
+        }
+
+        <!-- CITY DROPDOWN -->
+        @if (formCharge.chargeScope === 'CITY') {
+          <div>
+            <label class="mb-2 block text-sm font-semibold text-gray-700">
+              City <span class="text-red-500">*</span>
+            </label>
+
+            <select
+              name="cityId"
+              [(ngModel)]="formCharge.cityId"
+              required
+              [disabled]="!formCharge.stateCode"
+              class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:cursor-not-allowed disabled:bg-gray-100">
+
+              <option [ngValue]="null">
+                Select City
+              </option>
+
+              @for (city of cities; track city.cityId) {
+                <option [ngValue]="city.cityId">
+                  {{ city.cityName }}
+                </option>
+              }
+
+            </select>
+
+            @if (formCharge.stateCode && cities.length === 0) {
+              <p class="mt-1.5 text-xs text-gray-500">
+                No cities available for the selected state.
+              </p>
+            }
+          </div>
+        }
+
+        <!-- CHARGE NAME -->
+        <div>
+          <label class="mb-2 block text-sm font-semibold text-gray-700">
+            Charge Name <span class="text-red-500">*</span>
+          </label>
+
+          <input
+            type="text"
+            name="chargeName"
+            [(ngModel)]="formCharge.chargeName"
+            required
+            maxlength="100"
+            placeholder="e.g. Registration Fee"
+            class="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100">
+        </div>
+
+        <!-- CHARGE VALUE -->
+        <div>
+          <label class="mb-2 block text-sm font-semibold text-gray-700">
+            Charge Value (₹) <span class="text-red-500">*</span>
+          </label>
+
+          <div class="relative">
+            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-medium text-gray-500">
+              ₹
+            </span>
+
+            <input
+              type="number"
+              name="chargeValue"
+              [(ngModel)]="formCharge.chargeValue"
+              required
+              min="0"
+              step="0.0001"
+              placeholder="0.00"
+              class="w-full rounded-lg border border-gray-300 py-3 pl-9 pr-4 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100">
+          </div>
+
+          <p class="mt-1.5 text-xs text-gray-500">
+            Enter a fixed monetary amount. Maximum four decimal places.
+          </p>
+        </div>
+
+        <!-- FORM ACTIONS -->
+        <div class="flex justify-end gap-3 border-t border-gray-100 pt-5">
+
+          <button
+            type="button"
+            (click)="closeForm()"
+            class="rounded-lg border border-gray-300 px-5 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50">
+            Cancel
+          </button>
+
+          <button
+            type="submit"
+            [disabled]="isSaving || chargeForm.invalid"
+            class="rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50">
+
+            @if (isSaving) {
+              Saving...
+            } @else {
+              {{ isEditMode ? 'Update Charge' : 'Save Charge' }}
+            }
+
+          </button>
+
+        </div>
+
+      </form>
+
+    </div>
+
+  </div>
+}
+
+
+<!-- ===================================== -->
+<!-- DELETE CONFIRMATION MODAL -->
+<!-- ===================================== -->
+
+@if (showDeletePopup && chargeToDelete) {
+  <div class="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 p-4">
+
+    <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
+
+      <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-100 text-xl text-red-600">
+        !
+      </div>
+
+      <h2 class="text-lg font-bold text-gray-900">
+        Delete Registration Charge?
+      </h2>
+
+      <p class="mt-2 text-sm leading-6 text-gray-500">
+        Are you sure you want to delete
+        <strong class="text-gray-800">
+          {{ chargeToDelete.chargeName }}
+        </strong>?
+        This action cannot be undone.
+      </p>
+
+      <div class="mt-6 flex justify-end gap-3">
+
+        <button
+          type="button"
+          (click)="cancelDelete()"
+          class="rounded-lg border border-gray-300 px-5 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50">
+          Cancel
+        </button>
+
+        <button
+          type="button"
+          (click)="confirmDelete()"
+          [disabled]="isDeleting"
+          class="rounded-lg bg-red-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-50">
+
+          {{ isDeleting ? 'Deleting...' : 'Delete' }}
+
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+}

@@ -1,0 +1,342 @@
+
+<div class="w-full space-y-6">
+
+  <!-- Page Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">Insurance Management</h1>
+      <p class="mt-1 text-sm text-gray-500">
+        Manage insurance providers and their applicable percentages.
+      </p>
+    </div>
+
+    <button
+      type="button"
+      (click)="openAddForm()"
+      class="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-blue-700 transition"
+    >
+      <span class="text-lg leading-none">+</span>
+      Add Insurance Provider
+    </button>
+  </div>
+
+  <!-- Success Message -->
+  @if (successMessage) {
+    <div class="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
+      {{ successMessage }}
+    </div>
+  }
+
+  <!-- Error Message -->
+  @if (errorMessage) {
+    <div class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+      {{ errorMessage }}
+    </div>
+  }
+
+  <!-- Summary and Search -->
+  <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+
+      <div>
+        <p class="text-sm text-gray-500">Total Insurance Providers</p>
+        <p class="mt-1 text-2xl font-bold text-gray-900">
+          {{ insurances.length }}
+        </p>
+      </div>
+
+      <div class="w-full sm:max-w-sm">
+        <label for="insuranceSearch" class="mb-1.5 block text-sm font-medium text-gray-700">
+          Search Providers
+        </label>
+        <input
+          id="insuranceSearch"
+          type="text"
+          [(ngModel)]="searchText"
+          placeholder="Search by ID, provider name or percentage..."
+          class="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+        />
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Insurance Table -->
+  <div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+
+    <div class="border-b border-gray-200 px-5 py-4">
+      <h2 class="text-base font-semibold text-gray-900">Insurance Providers</h2>
+      <p class="mt-1 text-sm text-gray-500">
+        View and manage configured insurance providers.
+      </p>
+    </div>
+
+    @if (isLoading) {
+      <div class="flex items-center justify-center py-12">
+        <div class="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-blue-600"></div>
+        <span class="ml-3 text-sm text-gray-500">Loading insurance providers...</span>
+      </div>
+    } @else if (filteredInsurances.length === 0) {
+      <div class="px-5 py-12 text-center">
+        <p class="text-base font-medium text-gray-700">No insurance providers found</p>
+        <p class="mt-1 text-sm text-gray-500">
+          Add an insurance provider or try a different search.
+        </p>
+      </div>
+    } @else {
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+                Insurance ID
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+                Provider Name
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+                Percentage
+              </th>
+              <th class="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">
+                Actions
+              </th>
+            </tr>
+          </thead>
+
+          <tbody class="divide-y divide-gray-100 bg-white">
+            @for (insurance of filteredInsurances; track insurance.insuranceId) {
+              <tr class="hover:bg-gray-50 transition">
+
+                <td class="whitespace-nowrap px-6 py-4">
+                  <span class="rounded-md bg-gray-100 px-2.5 py-1 text-xs font-semibold text-gray-700">
+                    {{ insurance.insuranceId }}
+                  </span>
+                </td>
+
+                <td class="whitespace-nowrap px-6 py-4">
+                  <span class="text-sm font-medium text-gray-900">
+                    {{ insurance.providerName }}
+                  </span>
+                </td>
+
+                <td class="whitespace-nowrap px-6 py-4">
+                  <span class="text-sm font-semibold text-gray-700">
+                    {{ insurance.percentage }}%
+                  </span>
+                </td>
+
+                <td class="whitespace-nowrap px-6 py-4 text-right">
+                  <div class="flex items-center justify-end gap-3">
+                    <button
+                      type="button"
+                      (click)="openEditForm(insurance)"
+                      class="text-sm font-medium text-blue-600 hover:text-blue-800"
+                    >
+                      Edit
+                    </button>
+
+                    <button
+                      type="button"
+                      (click)="deleteInsurance(insurance)"
+                      class="text-sm font-medium text-red-600 hover:text-red-800"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </td>
+
+              </tr>
+            }
+          </tbody>
+
+        </table>
+      </div>
+    }
+
+    <div class="border-t border-gray-200 px-5 py-3">
+      <p class="text-xs text-gray-500">
+        Showing {{ filteredInsurances.length }} of {{ insurances.length }} providers
+      </p>
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- Add / Edit Insurance Modal -->
+@if (showForm) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 py-6">
+
+    <div class="w-full max-w-lg rounded-xl bg-white shadow-xl">
+
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between border-b border-gray-200 px-6 py-4">
+        <div>
+          <h2 class="text-lg font-semibold text-gray-900">
+            {{ isEditMode ? 'Edit Insurance Provider' : 'Add Insurance Provider' }}
+          </h2>
+          <p class="mt-1 text-sm text-gray-500">
+            Enter the insurance provider details.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          (click)="closeForm()"
+          class="rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-700"
+        >
+          ✕
+        </button>
+      </div>
+
+      <!-- Modal Form -->
+      <form #insuranceForm="ngForm" (ngSubmit)="saveInsurance()" class="space-y-5 px-6 py-5">
+
+        <!-- Insurance ID -->
+        <div>
+          <label for="insuranceId" class="mb-1.5 block text-sm font-medium text-gray-700">
+            Insurance ID <span class="text-red-500">*</span>
+          </label>
+
+          <input
+            id="insuranceId"
+            name="insuranceId"
+            type="text"
+            [(ngModel)]="formInsurance.insuranceId"
+            required
+            [disabled]="isEditMode"
+            placeholder="e.g. TA01"
+            class="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:bg-gray-100 disabled:text-gray-500"
+          />
+
+          @if (isEditMode) {
+            <p class="mt-1 text-xs text-gray-500">
+              Insurance ID cannot be changed while editing.
+            </p>
+          }
+        </div>
+
+        <!-- Provider Name -->
+        <div>
+          <label for="providerName" class="mb-1.5 block text-sm font-medium text-gray-700">
+            Provider Name <span class="text-red-500">*</span>
+          </label>
+
+          <input
+            id="providerName"
+            name="providerName"
+            type="text"
+            [(ngModel)]="formInsurance.providerName"
+            required
+            placeholder="e.g. Tata AIG"
+            class="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+          />
+        </div>
+
+        <!-- Percentage -->
+        <div>
+          <label for="percentage" class="mb-1.5 block text-sm font-medium text-gray-700">
+            Insurance Percentage <span class="text-red-500">*</span>
+          </label>
+
+          <div class="relative">
+            <input
+              id="percentage"
+              name="percentage"
+              type="number"
+              [(ngModel)]="formInsurance.percentage"
+              required
+              min="0"
+              max="100"
+              step="0.01"
+              placeholder="e.g. 2.5"
+              class="w-full rounded-lg border border-gray-300 px-3 py-2.5 pr-10 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+            />
+            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-400">
+              %
+            </span>
+          </div>
+
+          <p class="mt-1 text-xs text-gray-500">
+            Enter a value between 0 and 100.
+          </p>
+        </div>
+
+        <!-- Modal Actions -->
+        <div class="flex justify-end gap-3 border-t border-gray-100 pt-4">
+
+          <button
+            type="button"
+            (click)="closeForm()"
+            class="rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+          >
+            Cancel
+          </button>
+
+          <button
+            type="submit"
+            [disabled]="isSaving || !insuranceForm.valid"
+            class="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {{ isSaving ? 'Saving...' : (isEditMode ? 'Update Provider' : 'Save Provider') }}
+          </button>
+
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+}
+
+
+<!-- Delete Confirmation Modal -->
+@if (showDeletePopup && insuranceToDelete) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 py-6">
+
+    <div class="w-full max-w-md rounded-xl bg-white p-6 shadow-xl">
+
+      <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
+        <span class="text-xl text-red-600">!</span>
+      </div>
+
+      <h2 class="text-lg font-semibold text-gray-900">
+        Delete Insurance Provider?
+      </h2>
+
+      <p class="mt-2 text-sm leading-6 text-gray-500">
+        Are you sure you want to delete
+        <span class="font-semibold text-gray-800">
+          {{ insuranceToDelete.providerName }}
+        </span>
+        ({{ insuranceToDelete.insuranceId }})?
+        This action cannot be undone.
+      </p>
+
+      <div class="mt-6 flex justify-end gap-3">
+
+        <button
+          type="button"
+          (click)="cancelDelete()"
+          [disabled]="isDeleting"
+          class="rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+        >
+          Cancel
+        </button>
+
+        <button
+          type="button"
+          (click)="confirmDelete()"
+          [disabled]="isDeleting"
+          class="rounded-lg bg-red-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50"
+        >
+          {{ isDeleting ? 'Deleting...' : 'Delete Provider' }}
+        </button>
+
+      </div>
+
+    </div>
+  </div>
+}

@@ -1,0 +1,321 @@
+
+<div class="space-y-6">
+
+  <!-- Page header -->
+  <div class="flex items-center justify-between">
+    <div>
+      <h2 class="text-2xl font-bold text-slate-900">
+        Location Management
+      </h2>
+      <p class="mt-1 text-sm text-slate-500">
+        Manage states, cities and RTO offices in one place.
+      </p>
+    </div>
+
+    <button
+      (click)="openAddState()"
+      class="rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700">
+      + Add State
+    </button>
+  </div>
+
+  <!-- Error -->
+  @if (errorMessage) {
+    <div class="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+      {{ errorMessage }}
+    </div>
+  }
+
+  <!-- Location table -->
+  <div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+
+    <div class="grid grid-cols-12 border-b bg-slate-50 px-6 py-4 text-xs font-semibold uppercase tracking-wide text-slate-500">
+      <div class="col-span-7">Location</div>
+      <div class="col-span-3">Code / Details</div>
+      <div class="col-span-2 text-right">Actions</div>
+    </div>
+
+    @if (loadingStates) {
+      <div class="p-8 text-center text-sm text-slate-500">
+        Loading states...
+      </div>
+    }
+
+    @if (!loadingStates && states.length === 0) {
+      <div class="p-10 text-center text-slate-500">
+        No states found. Add your first state.
+      </div>
+    }
+
+    @for (state of states; track trackState($index, state)) {
+
+      <!-- STATE -->
+      <div class="grid grid-cols-12 items-center border-b px-6 py-4 hover:bg-slate-50">
+
+        <div class="col-span-7 flex items-center gap-3">
+          <button
+            (click)="toggleState(state)"
+            class="text-slate-500">
+            {{ expandedStates.has(state.stateCode) ? '▼' : '▶' }}
+          </button>
+
+          <span class="font-semibold text-slate-800">
+            {{ state.stateName }}
+          </span>
+        </div>
+
+        <div class="col-span-3 text-sm text-slate-500">
+          {{ state.stateCode }}
+          <span class="ml-2 text-xs">
+            {{ cities[state.stateCode]?.length ?? '—' }} cities
+          </span>
+        </div>
+
+        <div class="col-span-2 flex justify-end gap-3">
+          <button
+            (click)="openAddCity(state.stateCode)"
+            title="Add City"
+            class="text-blue-600 hover:text-blue-800">
+            + City
+          </button>
+
+          <button
+            (click)="openEditState(state)"
+            class="text-slate-500 hover:text-blue-600">
+            Edit
+          </button>
+
+          <button
+            (click)="deleteState(state)"
+            class="text-red-500 hover:text-red-700">
+            Delete
+          </button>
+        </div>
+      </div>
+
+      @if (expandedStates.has(state.stateCode)) {
+
+        @if (loadingCities.has(state.stateCode)) {
+          <div class="bg-slate-50 py-4 pl-16 text-sm text-slate-500">
+            Loading cities...
+          </div>
+        }
+
+        @for (city of (cities[state.stateCode] ?? []); track trackCity($index, city)) {
+
+          <!-- CITY -->
+          <div class="grid grid-cols-12 items-center border-b bg-slate-50 px-6 py-3">
+
+            <div class="col-span-7 flex items-center gap-3 pl-8">
+              <button
+                (click)="toggleCity(city)"
+                class="text-slate-500">
+                {{ expandedCities.has(city.cityId) ? '▼' : '▶' }}
+              </button>
+
+              <span class="font-medium text-slate-700">
+                {{ city.cityName }}
+              </span>
+            </div>
+
+            <div class="col-span-3 text-sm text-slate-500">
+              City ID: {{ city.cityId }}
+              <span class="ml-2 text-xs">
+                {{ rtos[city.cityId]?.length ?? '—' }} RTOs
+              </span>
+            </div>
+
+            <div class="col-span-2 flex justify-end gap-3">
+              <button
+                (click)="openAddRto(city)"
+                class="text-blue-600 hover:text-blue-800">
+                + RTO
+              </button>
+
+              <button
+                (click)="openEditCity(city)"
+                class="text-slate-500 hover:text-blue-600">
+                Edit
+              </button>
+
+              <button
+                (click)="deleteCity(city)"
+                class="text-red-500 hover:text-red-700">
+                Delete
+              </button>
+            </div>
+          </div>
+
+          @if (expandedCities.has(city.cityId)) {
+
+            @if (loadingRtos.has(city.cityId)) {
+              <div class="bg-white py-3 pl-28 text-sm text-slate-500">
+                Loading RTOs...
+              </div>
+            }
+
+            @for (rto of (rtos[city.cityId] ?? []); track trackRto($index, rto)) {
+
+              <!-- RTO -->
+              <div class="grid grid-cols-12 items-center border-b bg-white px-6 py-3">
+
+                <div class="col-span-7 flex items-center gap-3 pl-20">
+                  <span class="text-sm font-medium text-slate-700">
+                    {{ rto.rtoName }}
+                  </span>
+                </div>
+
+                <div class="col-span-3 text-sm text-slate-500">
+                  {{ rto.rtoCode }}
+                </div>
+
+                <div class="col-span-2 flex justify-end gap-3">
+                  <button
+                    (click)="openEditRto(rto)"
+                    class="text-slate-500 hover:text-blue-600">
+                    Edit
+                  </button>
+
+                  <button
+                    (click)="deleteRto(rto)"
+                    class="text-red-500 hover:text-red-700">
+                    Delete
+                  </button>
+                </div>
+              </div>
+            }
+
+            @if (!loadingRtos.has(city.cityId) && (rtos[city.cityId] ?? []).length === 0) {
+              <div class="bg-white py-3 pl-28 text-sm text-slate-400">
+                No RTOs found for this city.
+              </div>
+            }
+          }
+        }
+
+        @if (!loadingCities.has(state.stateCode) && (cities[state.stateCode] ?? []).length === 0) {
+          <div class="bg-slate-50 py-4 pl-16 text-sm text-slate-400">
+            No cities found for this state.
+          </div>
+        }
+      }
+    }
+  </div>
+</div>
+
+<!-- ADD / EDIT MODAL -->
+@if (editorType) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+
+    <div class="w-full max-w-lg rounded-xl bg-white p-6 shadow-xl">
+
+      <div class="mb-6 flex items-center justify-between">
+        <h3 class="text-xl font-bold text-slate-900">
+          {{ editing ? 'Edit' : 'Add' }}
+          {{ editorType === 'state' ? 'State' : editorType === 'city' ? 'City' : 'RTO' }}
+        </h3>
+
+        <button (click)="closeEditor()" class="text-xl text-slate-400">
+          &times;
+        </button>
+      </div>
+
+      @if (editorType === 'state') {
+        <div class="space-y-4">
+          <div>
+            <label class="mb-1 block text-sm font-medium">State Code</label>
+            <input
+              [(ngModel)]="stateForm.stateCode"
+              [disabled]="editing"
+              placeholder="OD"
+              class="w-full rounded-lg border px-3 py-2 disabled:bg-slate-100"/>
+          </div>
+
+          <div>
+            <label class="mb-1 block text-sm font-medium">State Name</label>
+            <input
+              [(ngModel)]="stateForm.stateName"
+              placeholder="Odisha"
+              class="w-full rounded-lg border px-3 py-2"/>
+          </div>
+        </div>
+      }
+
+      @if (editorType === 'city') {
+        <div class="space-y-4">
+          <div>
+            <label class="mb-1 block text-sm font-medium">State</label>
+            <input
+              [value]="selectedStateCode"
+              disabled
+              class="w-full rounded-lg border bg-slate-100 px-3 py-2"/>
+          </div>
+
+          <div>
+            <label class="mb-1 block text-sm font-medium">City Name</label>
+            <input
+              [(ngModel)]="cityForm.cityName"
+              placeholder="Bhubaneswar"
+              class="w-full rounded-lg border px-3 py-2"/>
+          </div>
+        </div>
+      }
+
+      @if (editorType === 'rto') {
+        <div class="space-y-4">
+          <div>
+            <label class="mb-1 block text-sm font-medium">RTO Code</label>
+            <input
+              [(ngModel)]="rtoForm.rtoCode"
+              [disabled]="editing"
+              placeholder="OD-02"
+              class="w-full rounded-lg border px-3 py-2 disabled:bg-slate-100"/>
+          </div>
+
+          <div>
+            <label class="mb-1 block text-sm font-medium">RTO Name</label>
+            <input
+              [(ngModel)]="rtoForm.rtoName"
+              placeholder="Bhubaneswar RTO"
+              class="w-full rounded-lg border px-3 py-2"/>
+          </div>
+
+          <div>
+            <label class="mb-1 block text-sm font-medium">State Code</label>
+            <input
+              [value]="rtoForm.stateCode"
+              disabled
+              class="w-full rounded-lg border bg-slate-100 px-3 py-2"/>
+          </div>
+
+          <div>
+            <label class="mb-1 block text-sm font-medium">City ID</label>
+            <input
+              [value]="rtoForm.cityId"
+              disabled
+              class="w-full rounded-lg border bg-slate-100 px-3 py-2"/>
+          </div>
+        </div>
+      }
+
+      @if (errorMessage) {
+        <p class="mt-4 text-sm text-red-600">{{ errorMessage }}</p>
+      }
+
+      <div class="mt-7 flex justify-end gap-3">
+        <button
+          (click)="closeEditor()"
+          class="rounded-lg border px-4 py-2 text-sm hover:bg-slate-50">
+          Cancel
+        </button>
+
+        <button
+          (click)="save()"
+          [disabled]="saving"
+          class="rounded-lg bg-blue-600 px-5 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-50">
+          {{ saving ? 'Saving...' : 'Save' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

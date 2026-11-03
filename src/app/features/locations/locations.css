@@ -1,0 +1,22 @@
+
+:host {
+  display: block;
+}
+
+button {
+  transition: all 150ms ease;
+}
+
+input {
+  outline: none;
+  border-color: #cbd5e1;
+}
+
+input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgb(37 99 235 / 10%);
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
