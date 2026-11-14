@@ -1,59 +1,142 @@
 
 <div class="flex min-h-screen bg-slate-100">
 
-  <!-- Sidebar -->
-  <aside class="w-64 shrink-0 bg-slate-900 text-white">
+  <!-- Mobile overlay -->
+  @if (isMobileMenuOpen) {
+    <div
+      class="fixed inset-0 z-40 bg-slate-950/60 lg:hidden"
+      (click)="closeMobileMenu()">
+    </div>
+  }
 
-    <div class="border-b border-slate-700 px-6 py-5">
-      <h1 class="text-xl font-bold">DAP Admin</h1>
+  <!-- Sidebar -->
+  <aside
+    class="fixed inset-y-0 left-0 z-50 flex w-72 flex-col bg-slate-950 text-white shadow-xl transition-transform duration-300 lg:static lg:z-auto lg:min-h-screen lg:w-64 lg:shrink-0 lg:translate-x-0"
+    [class.-translate-x-full]="!isMobileMenuOpen">
+
+    <!-- Brand -->
+    <div class="flex items-center justify-between border-b border-slate-800 px-6 py-6">
+      <div>
+        <h1 class="text-xl font-bold tracking-wide">DAP</h1>
+        <p class="mt-1 text-xs tracking-widest text-slate-400">
+          ADMIN PORTAL
+        </p>
+      </div>
+
+      <button
+        type="button"
+        class="rounded-lg p-2 text-slate-400 hover:bg-slate-800 hover:text-white lg:hidden"
+        (click)="closeMobileMenu()"
+        aria-label="Close navigation">
+        ✕
+      </button>
     </div>
 
-    <!-- Existing Navigation -->
-    <nav class="mt-6 space-y-2 px-4">
+    <!-- Navigation -->
+    <nav class="flex-1 space-y-2 overflow-y-auto px-4 py-6">
+
+      <p class="mb-3 px-4 text-xs font-semibold uppercase tracking-widest text-slate-500">
+        Main Menu
+      </p>
 
       <a routerLink="/dashboard"
-         routerLinkActive="bg-blue-600"
-         class="block rounded-lg px-4 py-3 hover:bg-slate-800">
+         routerLinkActive="bg-blue-600 text-white"
+         (click)="closeMobileMenu()"
+         class="block rounded-lg px-4 py-3 text-slate-300 transition hover:bg-slate-800 hover:text-white">
         Dashboard
       </a>
 
       <a routerLink="/vehicles"
-         routerLinkActive="bg-blue-600"
-         class="block rounded-lg px-4 py-3 hover:bg-slate-800">
+         routerLinkActive="bg-blue-600 text-white"
+         (click)="closeMobileMenu()"
+         class="block rounded-lg px-4 py-3 text-slate-300 transition hover:bg-slate-800 hover:text-white">
         Vehicles
       </a>
 
       <a routerLink="/locations"
-         routerLinkActive="bg-blue-600"
-         class="block rounded-lg px-4 py-3 hover:bg-slate-800">
+         routerLinkActive="bg-blue-600 text-white"
+         (click)="closeMobileMenu()"
+         class="block rounded-lg px-4 py-3 text-slate-300 transition hover:bg-slate-800 hover:text-white">
         Location Management
       </a>
 
       <a routerLink="/insurance"
-         routerLinkActive="bg-blue-600"
-         class="block rounded-lg px-4 py-3 hover:bg-slate-800">
+         routerLinkActive="bg-blue-600 text-white"
+         (click)="closeMobileMenu()"
+         class="block rounded-lg px-4 py-3 text-slate-300 transition hover:bg-slate-800 hover:text-white">
         Insurance
       </a>
 
       <a routerLink="/registration-charges"
-         routerLinkActive="bg-blue-600"
-         class="block rounded-lg px-4 py-3 hover:bg-slate-800">
-         Registration Charges
+         routerLinkActive="bg-blue-600 text-white"
+         (click)="closeMobileMenu()"
+         class="block rounded-lg px-4 py-3 text-slate-300 transition hover:bg-slate-800 hover:text-white">
+        Registration Charges
       </a>
 
       <a routerLink="/taxes"
-         routerLinkActive="bg-blue-600"
-          class="block rounded-lg px-4 py-3 hover:bg-slate-800">
-          Tax Configuration
+         routerLinkActive="bg-blue-600 text-white"
+         (click)="closeMobileMenu()"
+         class="block rounded-lg px-4 py-3 text-slate-300 transition hover:bg-slate-800 hover:text-white">
+        Tax Configuration
       </a>
+
+
+      <a routerLink="/users"
+        routerLinkActive="bg-blue-600 text-white"
+        (click)="closeMobileMenu()"
+        class="block rounded-lg px-4 py-3 text-slate-300 transition hover:bg-slate-800 hover:text-white">
+        User Management
+      </a>
+
 
     </nav>
 
+    <!-- Sidebar Footer -->
+    <div class="border-t border-slate-800 p-4">
+      <p class="mb-3 px-3 text-xs text-slate-500">
+        Drive Away Price
+      </p>
+
+      <button
+        type="button"
+        (click)="logout()"
+        [disabled]="isLoggingOut"
+        class="w-full rounded-lg border border-slate-700 px-4 py-3 text-left text-sm font-medium text-slate-300 transition hover:border-red-500 hover:bg-red-500/10 hover:text-red-400 disabled:cursor-not-allowed disabled:opacity-50">
+
+        {{ isLoggingOut ? 'Signing out...' : 'Sign Out' }}
+
+      </button>
+    </div>
+
   </aside>
 
-  <!-- Main Page Content -->
-  <main class="min-w-0 flex-1 p-8">
-    <router-outlet></router-outlet>
+  <!-- Main Content -->
+  <main class="min-w-0 flex-1">
+
+    <!-- Mobile Header -->
+    <header class="sticky top-0 z-30 flex items-center gap-4 border-b border-slate-200 bg-white px-4 py-4 lg:hidden">
+
+      <button
+        type="button"
+        (click)="toggleMobileMenu()"
+        class="rounded-lg border border-slate-200 px-3 py-2 text-slate-700 hover:bg-slate-100"
+        aria-label="Open navigation">
+        ☰
+      </button>
+
+      <div>
+        <h2 class="font-semibold text-slate-900">DAP Admin</h2>
+        <p class="text-xs text-slate-500">Administration Portal</p>
+      </div>
+
+    </header>
+
+    <!-- Page Content -->
+    <div class="p-4 sm:p-6 lg:p-8">
+      <router-outlet></router-outlet>
+    </div>
+
   </main>
 
 </div>

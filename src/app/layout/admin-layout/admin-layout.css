@@ -1,0 +1,8 @@
+
+:host {
+  display: block;
+  min-height: 100vh;
+}
+
+/* Prevent background scrolling when the mobile navigation is open
+   through the fixed sidebar overlay. */

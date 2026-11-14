@@ -1,0 +1,196 @@
+
+<div class="login-page">
+
+  <div class="login-shell">
+
+    <!-- Left visual panel -->
+    <section class="visual-panel">
+
+      <div class="visual-content">
+
+        <div class="brand">
+          <div class="brand-mark">DAP</div>
+
+          <div>
+            <div class="brand-name">DRIVE AWAY PRICE</div>
+            <div class="brand-subtitle">ADMINISTRATION PORTAL</div>
+          </div>
+        </div>
+
+        <div class="visual-message">
+          <span class="eyebrow">ADMINISTRATOR ACCESS</span>
+
+          <h1>
+            Manage your
+            <span>automotive</span>
+            pricing ecosystem.
+          </h1>
+
+          <p>
+            A centralized workspace to manage vehicle information,
+            locations, insurance, registration charges and tax
+            configurations.
+          </p>
+        </div>
+
+        <div class="visual-footer">
+          <span class="status-dot"></span>
+          Secure administrative access
+        </div>
+
+      </div>
+
+      <div class="visual-decoration decoration-one"></div>
+      <div class="visual-decoration decoration-two"></div>
+
+    </section>
+
+
+    <!-- Right login panel -->
+    <section class="form-panel">
+
+      <div class="form-container">
+
+        <div class="mobile-brand">
+          <div class="brand-mark">DAP</div>
+          <span>DRIVE AWAY PRICE</span>
+        </div>
+
+        <div class="form-heading">
+          <span class="eyebrow">WELCOME BACK</span>
+
+          <h2>Administrator Login</h2>
+
+          <p>
+            Sign in using your administrator credentials
+            to continue.
+          </p>
+        </div>
+
+
+        @if (errorMessage) {
+          <div class="error-message" role="alert">
+            <span class="error-icon">!</span>
+            {{ errorMessage }}
+          </div>
+        }
+
+
+        <form
+          [formGroup]="loginForm"
+          (ngSubmit)="submitLogin()"
+          novalidate
+        >
+
+          <div class="form-field">
+
+            <label for="email">Email address</label>
+
+            <input
+              id="email"
+              type="email"
+              formControlName="email"
+              placeholder="admin@example.com"
+              autocomplete="username"
+              [class.invalid]="email.touched && email.invalid"
+            />
+
+            @if (email.touched && email.hasError('required')) {
+              <span class="field-error">
+                Email address is required.
+              </span>
+            }
+
+            @if (email.touched && email.hasError('email')) {
+              <span class="field-error">
+                Please enter a valid email address.
+              </span>
+            }
+
+          </div>
+
+
+          <div class="form-field">
+
+            <div class="label-row">
+              <label for="password">Password</label>
+            </div>
+
+            <div class="password-wrapper">
+
+              <input
+                id="password"
+                [type]="showPassword ? 'text' : 'password'"
+                formControlName="password"
+                placeholder="Enter your password"
+                autocomplete="current-password"
+                [class.invalid]="password.touched && password.invalid"
+              />
+
+              <button
+                type="button"
+                class="password-toggle"
+                (click)="togglePassword()"
+                [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'"
+              >
+                {{ showPassword ? 'Hide' : 'Show' }}
+              </button>
+
+            </div>
+
+            @if (password.touched && password.hasError('required')) {
+              <span class="field-error">
+                Password is required.
+              </span>
+            }
+
+          </div>
+
+
+          <button
+            type="submit"
+            class="login-button"
+            [disabled]="loading"
+          >
+
+            @if (loading) {
+              <span class="spinner"></span>
+              Signing in...
+            } @else {
+              Sign in to Admin Portal
+              <span class="button-arrow">→</span>
+            }
+
+          </button>
+
+        </form>
+
+
+        <div class="portal-switch">
+
+          <span>Not an administrator?</span>
+
+          <a routerLink="/user-login">
+            Continue to User Portal
+          </a>
+
+        </div>
+
+
+        <div class="security-note">
+          <span class="lock-icon">◆</span>
+          <span>Your session is protected by secure authentication.</span>
+        </div>
+
+      </div>
+
+    </section>
+
+  </div>
+
+  <footer class="page-footer">
+    <span>Drive Away Price · DAP</span>
+    <span>Administrator Portal</span>
+  </footer>
+
+</div>
