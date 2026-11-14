@@ -39,8 +39,7 @@ export class AuthService {
   private readonly router = inject(Router);
 
   // Complete backend authentication URL
-  private readonly authUrl =
-    `${API_CONFIG.baseUrl}${API_CONFIG.authUrl}`;
+  private readonly authUrl = API_CONFIG.authUrl;
 
   private readonly ACCESS_TOKEN_KEY = 'dap_access_token';
   private readonly REFRESH_TOKEN_KEY = 'dap_refresh_token';
