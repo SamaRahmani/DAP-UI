@@ -38,7 +38,9 @@ export class AuthService {
   private readonly http = inject(HttpClient);
   private readonly router = inject(Router);
 
-  private readonly authUrl = API_CONFIG.authUrl;
+  // Complete backend authentication URL
+  private readonly authUrl =
+    `${API_CONFIG.baseUrl}${API_CONFIG.authUrl}`;
 
   private readonly ACCESS_TOKEN_KEY = 'dap_access_token';
   private readonly REFRESH_TOKEN_KEY = 'dap_refresh_token';
@@ -46,6 +48,7 @@ export class AuthService {
 
   private refreshRequest$: Observable<LoginResponse> | null = null;
 
+  // LOGIN
   login(credentials: LoginRequest): Observable<LoginResponse> {
 
     return this.http.post<LoginResponse>(
@@ -54,6 +57,7 @@ export class AuthService {
     ).pipe(
       switchMap(response => {
 
+        // Only administrators can access Admin Portal
         if (!this.tokenHasRole(response.accessToken, 'ROLE_ADMIN')) {
 
           return this.http.post<void>(
@@ -76,6 +80,7 @@ export class AuthService {
     );
   }
 
+  // REFRESH ACCESS TOKEN
   refreshAccessToken(): Observable<LoginResponse> {
 
     const refreshToken = this.getRefreshToken();
@@ -103,6 +108,7 @@ export class AuthService {
     return this.refreshRequest$;
   }
 
+  // LOGOUT
   logout(): Observable<void> {
 
     const refreshToken = this.getRefreshToken();
@@ -124,6 +130,7 @@ export class AuthService {
     );
   }
 
+  // STORE TOKENS
   storeTokens(response: LoginResponse): void {
 
     sessionStorage.setItem(
@@ -142,22 +149,27 @@ export class AuthService {
     );
   }
 
+  // GET ACCESS TOKEN
   getAccessToken(): string | null {
     return sessionStorage.getItem(this.ACCESS_TOKEN_KEY);
   }
 
+  // GET REFRESH TOKEN
   getRefreshToken(): string | null {
     return sessionStorage.getItem(this.REFRESH_TOKEN_KEY);
   }
 
+  // GET TOKEN TYPE
   getTokenType(): string {
     return sessionStorage.getItem(this.TOKEN_TYPE_KEY) || 'Bearer';
   }
 
+  // CHECK AUTHENTICATION
   isAuthenticated(): boolean {
     return !!this.getAccessToken() && !!this.getRefreshToken();
   }
 
+  // CHECK ROLE
   hasRole(role: string): boolean {
 
     const token = this.getAccessToken();
@@ -169,6 +181,7 @@ export class AuthService {
     return this.tokenHasRole(token, role);
   }
 
+  // DECODE JWT AND CHECK ROLE
   private tokenHasRole(token: string, role: string): boolean {
 
     try {
@@ -196,6 +209,7 @@ export class AuthService {
     }
   }
 
+  // CLEAR SESSION
   clearSession(): void {
 
     sessionStorage.removeItem(this.ACCESS_TOKEN_KEY);
