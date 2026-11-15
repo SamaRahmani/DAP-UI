@@ -2,7 +2,6 @@
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
-import { environment } from '../../../environments/environment';
 
 import {
   Component,
@@ -10,6 +9,8 @@ import {
   inject,
   ChangeDetectorRef
 } from '@angular/core';
+
+import { API_CONFIG } from '../../core/config/api.config';
 
 import {
   AdminRegistrationChargeService,
@@ -50,15 +51,14 @@ export class RegistrationCharges implements OnInit {
   // DEPENDENCY INJECTION
   // =====================================
 
-  private http = inject(HttpClient);
+  private readonly http = inject(HttpClient);
 
-  private registrationChargeService =
+  private readonly registrationChargeService =
     inject(AdminRegistrationChargeService);
 
-  private cdr = inject(ChangeDetectorRef);
+  private readonly cdr = inject(ChangeDetectorRef);
 
-  private readonly locationBaseUrl =
-    environment.apiBaseUrl;
+  private readonly locationBaseUrl = API_CONFIG.adminUrl;
 
   // =====================================
   // DATA
@@ -248,7 +248,7 @@ export class RegistrationCharges implements OnInit {
     }
 
     this.http.get<CityOption[]>(
-      `${this.locationBaseUrl}/states/${stateCode}/cities`
+      `${this.locationBaseUrl}/states/${encodeURIComponent(stateCode)}/cities`
     ).subscribe({
 
       next: (data: CityOption[]) => {
@@ -358,7 +358,7 @@ export class RegistrationCharges implements OnInit {
     if (charge.chargeScope === 'CITY' && charge.stateCode) {
 
       this.http.get<CityOption[]>(
-        `${this.locationBaseUrl}/states/${charge.stateCode}/cities`
+        `${this.locationBaseUrl}/states/${encodeURIComponent(charge.stateCode)}/cities`
       ).subscribe({
 
         next: (data: CityOption[]) => {
