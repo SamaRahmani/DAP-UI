@@ -1,9 +1,10 @@
+
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../../environments/environment';
 
 import { Vehicle } from '../models/vehicle.model';
+import { API_CONFIG } from '../core/config/api.config';
 
 @Injectable({
   providedIn: 'root'
@@ -12,8 +13,7 @@ export class AdminVehicleService {
 
   private readonly http = inject(HttpClient);
 
-  private readonly apiUrl =
-  `${environment.apiBaseUrl}/vehicles`;
+  private readonly apiUrl = `${API_CONFIG.adminUrl}/vehicles`;
 
   getAllVehicles(): Observable<Vehicle[]> {
     return this.http.get<Vehicle[]>(this.apiUrl);
@@ -29,10 +29,7 @@ export class AdminVehicleService {
     return this.http.post<Vehicle>(this.apiUrl, vehicle);
   }
 
-  updateVehicle(
-    vehicleId: string,
-    vehicle: Vehicle
-  ): Observable<Vehicle> {
+  updateVehicle(vehicleId: string, vehicle: Vehicle): Observable<Vehicle> {
     return this.http.put<Vehicle>(
       `${this.apiUrl}/${encodeURIComponent(vehicleId)}`,
       vehicle

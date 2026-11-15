@@ -2,8 +2,8 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../../environments/environment';
 
+import { API_CONFIG } from '../core/config/api.config';
 
 export type ChargeScope = 'NATIONAL' | 'STATE' | 'CITY';
 
@@ -29,10 +29,10 @@ export interface RegistrationChargeRequest {
 })
 export class AdminRegistrationChargeService {
 
-  private http = inject(HttpClient);
+  private readonly http = inject(HttpClient);
 
   private readonly baseUrl =
-  `${environment.apiBaseUrl}/registration-charges`;
+    `${API_CONFIG.adminUrl}/registration-charges`;
 
   getAll(): Observable<RegistrationCharge[]> {
     return this.http.get<RegistrationCharge[]>(this.baseUrl);
@@ -44,13 +44,13 @@ export class AdminRegistrationChargeService {
 
   getByState(stateCode: string): Observable<RegistrationCharge[]> {
     return this.http.get<RegistrationCharge[]>(
-      `${this.baseUrl}/state/${stateCode}`
+      `${this.baseUrl}/state/${encodeURIComponent(stateCode)}`
     );
   }
 
   getStateLevelCharges(stateCode: string): Observable<RegistrationCharge[]> {
     return this.http.get<RegistrationCharge[]>(
-      `${this.baseUrl}/state/${stateCode}/state-level`
+      `${this.baseUrl}/state/${encodeURIComponent(stateCode)}/state-level`
     );
   }
 

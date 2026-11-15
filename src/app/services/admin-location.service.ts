@@ -2,7 +2,8 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../../environments/environment';
+
+import { API_CONFIG } from '../core/config/api.config';
 
 export interface State {
   stateCode: string;
@@ -27,9 +28,9 @@ export interface Rto {
 })
 export class AdminLocationService {
 
-  private http = inject(HttpClient);
+  private readonly http = inject(HttpClient);
 
-  private readonly baseUrl = environment.apiBaseUrl;
+  private readonly baseUrl = API_CONFIG.adminUrl;
 
   getStates(): Observable<State[]> {
     return this.http.get<State[]>(`${this.baseUrl}/states`);
@@ -40,16 +41,21 @@ export class AdminLocationService {
   }
 
   updateState(code: string, data: State): Observable<State> {
-    return this.http.put<State>(`${this.baseUrl}/states/${code}`, data);
+    return this.http.put<State>(
+      `${this.baseUrl}/states/${encodeURIComponent(code)}`,
+      data
+    );
   }
 
   deleteState(code: string): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/states/${code}`);
+    return this.http.delete<void>(
+      `${this.baseUrl}/states/${encodeURIComponent(code)}`
+    );
   }
 
   getCities(stateCode: string): Observable<City[]> {
     return this.http.get<City[]>(
-      `${this.baseUrl}/states/${stateCode}/cities`
+      `${this.baseUrl}/states/${encodeURIComponent(stateCode)}/cities`
     );
   }
 
@@ -57,7 +63,10 @@ export class AdminLocationService {
     return this.http.post<City>(`${this.baseUrl}/cities`, data);
   }
 
-  updateCity(id: number, data: { cityName: string; stateCode: string }): Observable<City> {
+  updateCity(
+    id: number,
+    data: { cityName: string; stateCode: string }
+  ): Observable<City> {
     return this.http.put<City>(`${this.baseUrl}/cities/${id}`, data);
   }
 
@@ -74,10 +83,15 @@ export class AdminLocationService {
   }
 
   updateRto(code: string, data: Rto): Observable<Rto> {
-    return this.http.put<Rto>(`${this.baseUrl}/rtos/${code}`, data);
+    return this.http.put<Rto>(
+      `${this.baseUrl}/rtos/${encodeURIComponent(code)}`,
+      data
+    );
   }
 
   deleteRto(code: string): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/rtos/${code}`);
+    return this.http.delete<void>(
+      `${this.baseUrl}/rtos/${encodeURIComponent(code)}`
+    );
   }
 }
